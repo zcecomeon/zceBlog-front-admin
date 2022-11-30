@@ -12,7 +12,7 @@
           </el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input size="large" placeholder="请输入密码" v-model.trim="formData.password">
+          <el-input type="password" size="large" placeholder="请输入密码" v-model.trim="formData.password">
             <!-- 引入阿里图标，查阅element的prefix插槽 -->
             <template #prefix>
               <span class="iconfont icon-password"></span>
@@ -78,6 +78,7 @@ const rules = {
 const login = () => {
   // Request 返回的是一个Promise所以这里使用async修饰
   formDataRef.value.validate( async (valid) => {
+    // 先进行简单的输入格式校验
     if (!valid) {
       return;
     }
@@ -88,11 +89,11 @@ const login = () => {
         account: formData.account,
         password: formData.password,
         checkCode: formData.checkCode,
+      },
+      errorCallBack: () =>{
+        changeCheckCode();
       }
-    }).then((res)=>{
-      console.log(res);
     })
-
   })
 
 }

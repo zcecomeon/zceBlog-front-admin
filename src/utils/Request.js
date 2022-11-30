@@ -5,6 +5,7 @@ const contentTypeJson = "application/json";
 const contentTypeFile = "multipart/form-data";
 import { ElLoading, ElMessage } from 'element-plus'
 import message from './Message';
+import router from '../router';
 
 const request = (config) => {
     // debugger
@@ -54,10 +55,7 @@ const request = (config) => {
             if (showLoading && loading) {
                 loading.close();
             }
-            ElMessage({
-                message: '发送请求失败',
-                type: 'error',
-            })
+            message.error("发送请求失败")
             return Promise.reject("发送请求失败")
         }
     )
@@ -70,11 +68,29 @@ const request = (config) => {
             const responseData = response.data;
             if (responseData.status == "error") {
                 // message.error(responseData.info)
-                return Promise.reject(responseData.info)
-            }else{
 
+                // 请求拦截会拦截各种请求，当我们登陆时，会传一个参数其中就有errorCallBack函数，
+                // 若该函数存在表示需要执行回调函数动态刷新验证码
+                if (config.errorCallBack) {
+                    config.errorCallBack();
+                }
+
+                return Promise.reject(responseData.info)
+                // return responseData;
+            }else{
+                // 后端根据请求返回的状态码不同，由此设置不同的返回状态
+                if (responseData.code == 200) {
+                    return responseData;
+                } else if (responseData.code == 901) {
+                    // 登录超时，页面跳转到登录页
+                    setTimeout( () =>{
+                        router.push("/login")
+                    },2000);
+                    return Promise.reject("登录超时")
+                }
+                
             }
-            return responseData;
+            
         },
         (error) => {
             if (showLoading && loading) {
@@ -86,16 +102,14 @@ const request = (config) => {
 
     // 写法一、
     // return Promise.post(url,params).catch(error => {
-    //     ElMessage({
-    //         message: error,
-    //         type: 'error',
-    //     })
+    //     message.error(error)
+    //     return null;
     // })
     
-    // 写法二、
+    // 写法二、无法取得返回值，不推荐
     let result = new Promise((resolve, reject) => {
         instance.post(url,params).then(res => {
-            resolve(res);
+            return resolve(res);
         }).catch((error)=>{
             ElMessage({
                 message: error,
@@ -103,7 +117,6 @@ const request = (config) => {
             })
         })
     })
-    return result;
 
 }
 
