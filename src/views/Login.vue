@@ -41,8 +41,9 @@
 
 <script setup>
 import { ref, reactive, getCurrentInstance } from 'vue'
-const { proxy } = getCurrentInstance();
+import VueCookies from 'vue-cookies';
 
+const { proxy } = getCurrentInstance();
 const api = {
   checkCode: "api/checkCode",
   login: "login",
@@ -77,12 +78,11 @@ const rules = {
 
 const login = () => {
   // Request 返回的是一个Promise所以这里使用async修饰
-  formDataRef.value.validate( async (valid) => {
+  formDataRef.value.validate(async (valid) => {
     // 先进行简单的输入格式校验
     if (!valid) {
       return;
     }
-    
     let result = await proxy.Request({
       url: api.login,
       params: {
@@ -90,11 +90,23 @@ const login = () => {
         password: formData.password,
         checkCode: formData.checkCode,
       },
-      errorCallBack: () =>{
+      errorCallBack: () => {
         changeCheckCode();
       }
     })
-  })
+    if (!result) {
+      return;
+    }
+    // cookie需要保存的用户登录信息
+    const loginInfo = {
+      account: formData.account,
+      password: formData.password,
+    }
+    VueCookies.set("userInfo", result.data,0)
+    if (formData.rememberMe) {
+      VueCookies.set("loginInfo", loginInfo, "7d")
+    }
+  });
 
 }
 </script>
@@ -110,7 +122,7 @@ const login = () => {
 
 .login-panel {
   margin-top: 10%;
-  margin-right: 35%;
+  margin-right: 15%;
   padding: 20px;
   float: right; //靠右浮漂
   width: 350px;
@@ -130,7 +142,7 @@ const login = () => {
 
     .input-code {
       flex: 1;
-      margin-right: 10px; 
+      margin-right: 10px;
     }
 
     .check-code {
@@ -138,7 +150,7 @@ const login = () => {
     }
   }
 
-  .code-handle-panel{
+  .code-handle-panel {
     display: flex;
   }
 
