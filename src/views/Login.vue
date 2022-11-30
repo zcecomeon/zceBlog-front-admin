@@ -4,7 +4,7 @@
       <div class="login-title">用户登录</div>
       <el-form :model="formData" :rules="rules" ref="formDataRef">
         <el-form-item prop="account">
-          <el-input size="large" placeholder="请输入账号" :model="formData.account">
+          <el-input size="large" placeholder="请输入账号" v-model.trim="formData.account">
             <!-- 引入阿里图标，查阅element的prefix插槽 -->
             <template #prefix>
               <span class="iconfont icon-account"></span>
@@ -12,7 +12,7 @@
           </el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input size="large" placeholder="请输入密码" :model="formData.password">
+          <el-input size="large" placeholder="请输入密码" v-model.trim="formData.password">
             <!-- 引入阿里图标，查阅element的prefix插槽 -->
             <template #prefix>
               <span class="iconfont icon-password"></span>
@@ -21,7 +21,7 @@
         </el-form-item>
         <div class="check-code-panel">
           <el-form-item prop="checkCode">
-            <el-input size="large" class="input-code" placeholder="请输入验证码" :model="formData.checkCode" />
+            <el-input size="large" class="input-code" placeholder="请输入验证码" v-model.trim="formData.checkCode" />
             <img :src="checkCodeUrl" class="check-code" @click="changeCheckCode">
           </el-form-item>
         </div>
@@ -40,12 +40,18 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, getCurrentInstance } from 'vue'
+const { proxy } = getCurrentInstance();
 
 const api = {
-  checkCode: "api/checkCode"
+  checkCode: "api/checkCode",
+  login: "login",
 }
-const formData = reactive({});
+const formData = reactive({
+  // account: "",
+  // password: "",
+  // checkCode: ""
+});
 const formDataRef = ref();
 // 下面使用了请求接口
 const checkCodeUrl = ref(api.checkCode)
@@ -70,10 +76,23 @@ const rules = {
 }
 
 const login = () => {
-  formDataRef.value.validate((valid) => {
+  // Request 返回的是一个Promise所以这里使用async修饰
+  formDataRef.value.validate( async (valid) => {
     if (!valid) {
       return;
     }
+    
+    let result = await proxy.Request({
+      url: api.login,
+      params: {
+        account: formData.account,
+        password: formData.password,
+        checkCode: formData.checkCode,
+      }
+    }).then((res)=>{
+      console.log(res);
+    })
+
   })
 
 }
