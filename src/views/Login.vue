@@ -2,39 +2,40 @@
   <div class="login-body">
     <div class="login-panel">
       <div class="login-title">用户登录</div>
-      <el-form 
-      :model="formData"
-      :rules="rules"
-       ref="formDataRef">
+      <el-form :model="formData" :rules="rules" ref="formDataRef">
         <el-form-item prop="account">
           <el-input size="large" placeholder="请输入账号" :model="formData.account">
-          <template #prefix>
-            <span class="iconfont icon-account"></span>
-          </template>
-        </el-input>
+            <!-- 引入阿里图标，查阅element的prefix插槽 -->
+            <template #prefix>
+              <span class="iconfont icon-account"></span>
+            </template>
+          </el-input>
         </el-form-item>
         <el-form-item prop="password">
           <el-input size="large" placeholder="请输入密码" :model="formData.password">
-          <template #prefix>
-            <span class="iconfont icon-password"></span>
-          </template>
-        </el-input>
+            <!-- 引入阿里图标，查阅element的prefix插槽 -->
+            <template #prefix>
+              <span class="iconfont icon-password"></span>
+            </template>
+          </el-input>
         </el-form-item>
         <div class="check-code-panel">
-          <el-form-item prop="checkCode" >
+          <el-form-item prop="checkCode">
             <el-input size="large" class="input-code" placeholder="请输入验证码" :model="formData.checkCode" />
             <img :src="checkCodeUrl" class="check-code" @click="changeCheckCode">
           </el-form-item>
         </div>
-        <el-form-item label="记住密码">
-          <el-checkbox :model="formData.rememberMe" :label="true">记住密码</el-checkbox>
-        </el-form-item>
+        <div class="code-handle-panel">
+          <el-form-item>
+            <el-checkbox :model="formData.rememberMe" :label="true">记住密码</el-checkbox>
+          </el-form-item>
+          <!-- 可以添加忘记密码模块 -->
+        </div>
         <el-form-item>
           <el-button type="primary" style="width:100%" @click="login">登录</el-button>
         </el-form-item>
       </el-form>
     </div>
-
   </div>
 </template>
 
@@ -49,15 +50,23 @@ const formDataRef = ref();
 // 下面使用了请求接口
 const checkCodeUrl = ref(api.checkCode)
 
-const changeCheckCode = () =>{
+const changeCheckCode = () => {
   checkCodeUrl.value = api.checkCode + "?" + new Date().getTime();
 }
 
 const rules = {
-  account:[{
+  account: [{
     required: true,
     message: "请输入用户名",
   }],
+  password: [{
+    required: true,
+    message: "请输入密码",
+  }],
+  checkCode: [{
+    required: true,
+    message: "请输入验证码",
+  }]
 }
 
 const login = () => {
@@ -95,15 +104,22 @@ const login = () => {
     margin-top: 20px;
     margin-bottom: 10px;
   }
-  .check-code-panel{
+
+  .check-code-panel {
     display: flex;
-    .input-code{
+
+    .input-code {
       flex: 1;
-      margin-right: 10px;
+      margin-right: 10px; 
     }
-    .check-code{
+
+    .check-code {
       flex: 1;
     }
+  }
+
+  .code-handle-panel{
+    display: flex;
   }
 
 }
