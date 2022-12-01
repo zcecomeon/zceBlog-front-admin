@@ -3,7 +3,7 @@ import axios from 'axios'
 const contentTypeForm = "application/x-www-form-urlencoded;charset=UTF-8";
 const contentTypeJson = "application/json";
 const contentTypeFile = "multipart/form-data";
-import { ElLoading, ElMessage } from 'element-plus'
+import { ElLoading, ElMessage } from 'element-plus';
 import message from './Message';
 import router from '../router';
 
@@ -80,6 +80,7 @@ const request = (config) => {
             }else{
                 // 后端根据请求返回的状态码不同，由此设置不同的返回状态
                 if (responseData.code == 200) {
+                    // return Promise.resolve("@@@200")
                     return responseData;
                 } else if (responseData.code == 901) {
                     // 登录超时，页面跳转到登录页
@@ -101,22 +102,23 @@ const request = (config) => {
     )
 
     // 写法一、
-    // return Promise.post(url,params).catch(error => {
-    //     message.error(error)
-    //     return null;
-    // })
+    return instance.post(url,params).catch(error => {
+        message.error(error)
+        //  出现异常返回null
+        return null;
+    })
     
     // 写法二、无法取得返回值，不推荐
-    let result = new Promise((resolve, reject) => {
-        instance.post(url,params).then(res => {
-            return resolve(res);
-        }).catch((error)=>{
-            ElMessage({
-                message: error,
-                type: 'error',
-            })
-        })
-    })
+    // let result = new Promise((resolve, reject) => {
+    //     instance.post(url,params).then(res => {
+    //         return resolve(res);
+    //     }).catch((error)=>{
+    //         ElMessage({
+    //             message: error,
+    //             type: 'error',
+    //         })
+    //     })
+    // })
 
 }
 
