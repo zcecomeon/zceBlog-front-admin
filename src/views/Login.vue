@@ -46,7 +46,7 @@ import VueCookies from 'vue-cookies';
 const { proxy } = getCurrentInstance();
 const api = {
   checkCode: "api/checkCode",
-  login: "login",
+  login: "/login",
 }
 const formData = reactive({
   // account: "",
@@ -94,11 +94,16 @@ const login = () => {
         changeCheckCode();
       }
     })
+    
+    console.log(result);
     if (!result) {
       return;
     }
+    console.log("登录成功");
+    proxy.Message.success("登录成功");
+    debugger;
     // cookie需要保存的用户登录信息
-    const loginInfo = {
+    let loginInfo = {
       account: formData.account,
       password: formData.password,
     }
@@ -107,7 +112,6 @@ const login = () => {
       VueCookies.set("loginInfo", loginInfo, "7d")
     }
   });
-
 }
 </script>
 
