@@ -7,7 +7,7 @@ import { ElLoading, ElMessage } from 'element-plus';
 import message from './Message';
 import router from '../router';
 
-const request = (config) => {
+const request = async (config) => {
     // debugger
     // 创建一个config对象，对象包含以下这些元素, params成员为一个对象
     // 注意dataType和showLoading在某些请求中需要给出默认值
@@ -81,6 +81,7 @@ const request = (config) => {
                 // 后端根据请求返回的状态码不同，由此设置不同的返回状态
                 if (responseData.code == 200) {
                     // return Promise.resolve("@@@200")
+
                     return responseData;
                 } else if (responseData.code == 901) {
                     // 登录超时，页面跳转到登录页
@@ -102,13 +103,14 @@ const request = (config) => {
     )
 
     // 写法一、
-    return instance.post(url,params).catch(error => {
-        message.error(error)
-        //  出现异常返回null
+    try {
+        return await instance.post(url, params);
+    } catch (error_2) {
+        message.error(error_2);
         return null;
-    })
+    }
     
-    // 写法二、无法取得返回值，不推荐
+    // 写法二、无法取得返回值
     // let result = new Promise((resolve, reject) => {
     //     instance.post(url,params).then(res => {
     //         return resolve(res);

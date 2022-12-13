@@ -21,7 +21,7 @@
         </el-form-item>
         <div class="check-code-panel">
           <el-form-item prop="checkCode">
-            <el-input size="large" class="input-code" placeholder="请输入验证码" v-model.trim="formData.checkCode" />
+            <el-input @keyup.enter="login" size="large" class="input-code" placeholder="请输入验证码" v-model.trim="formData.checkCode" />
             <img :src="checkCodeUrl" class="check-code" @click="changeCheckCode">
           </el-form-item>
         </div>
@@ -42,6 +42,7 @@
 <script setup>
 import { ref, reactive, getCurrentInstance } from 'vue'
 import VueCookies from 'vue-cookies';
+import router from '../router'
 
 const { proxy } = getCurrentInstance();
 const api = {
@@ -99,9 +100,11 @@ const login = () => {
     if (!result) {
       return;
     }
-    console.log("登录成功");
     proxy.Message.success("登录成功");
-    debugger;
+
+    setTimeout( () => {
+      router.push("/")
+    })
     // cookie需要保存的用户登录信息
     let loginInfo = {
       account: formData.account,
